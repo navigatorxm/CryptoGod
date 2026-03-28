@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep \"^next$\")"
+      "Bash(grep \"^next$\")",
+      "Bash(python3 -c \":*)"
     ]
   }
 }

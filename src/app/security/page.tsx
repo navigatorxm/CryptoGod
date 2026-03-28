@@ -19,7 +19,7 @@ import {
   Info,
   Bug,
 } from 'lucide-react';
-import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
+import CodeBlock from '@/components/ui/CodeBlock';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import toast from 'react-hot-toast';
 
@@ -577,14 +577,14 @@ export default function SecurityPage() {
                     <span className="text-sm font-semibold">Vulnerable Pattern</span>
                   </div>
                   <div className="rounded-xl overflow-hidden border border-red-500/20 max-h-[400px]">
-                    <SyntaxHighlighter
+                    <CodeBlock
                       language="solidity"
                       style={atomOneDark}
                       customStyle={{ margin: 0, background: 'rgba(239, 68, 68, 0.05)', fontSize: '11px', maxHeight: '400px' }}
                       showLineNumbers
                     >
                       {selectedVector.vulnerableCode}
-                    </SyntaxHighlighter>
+                    </CodeBlock>
                   </div>
                 </div>
                 <div>
@@ -593,14 +593,14 @@ export default function SecurityPage() {
                     <span className="text-sm font-semibold">Secure Implementation</span>
                   </div>
                   <div className="rounded-xl overflow-hidden border border-green-500/20 max-h-[400px]">
-                    <SyntaxHighlighter
+                    <CodeBlock
                       language="solidity"
                       style={atomOneDark}
                       customStyle={{ margin: 0, background: 'rgba(16, 185, 129, 0.05)', fontSize: '11px', maxHeight: '400px' }}
                       showLineNumbers
                     >
                       {selectedVector.secureCode}
-                    </SyntaxHighlighter>
+                    </CodeBlock>
                   </div>
                 </div>
               </div>

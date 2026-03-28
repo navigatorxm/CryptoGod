@@ -18,7 +18,7 @@ import {
   Award,
   ArrowRight,
 } from 'lucide-react';
-import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
+import CodeBlock from '@/components/ui/CodeBlock';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 const TUTORIALS = [
@@ -481,9 +481,9 @@ export default function EducationPage() {
                     </p>
                     {selectedTutorial.steps[currentStep].code && (
                       <div className="rounded-xl overflow-hidden border border-white/10">
-                        <SyntaxHighlighter language="solidity" style={atomOneDark} customStyle={{ margin: 0, background: 'hsl(240 15% 9%)', fontSize: '12px' }} showLineNumbers>
+                        <CodeBlock language="solidity" style={atomOneDark} customStyle={{ margin: 0, background: 'hsl(240 15% 9%)', fontSize: '12px' }} showLineNumbers>
                           {selectedTutorial.steps[currentStep].code!}
-                        </SyntaxHighlighter>
+                        </CodeBlock>
                       </div>
                     )}
                     <div className="flex gap-3 pt-2">
@@ -530,9 +530,9 @@ export default function EducationPage() {
                 </div>
               </div>
               <div className="rounded-xl overflow-hidden border border-white/10">
-                <SyntaxHighlighter language={selectedTemplate.language} style={atomOneDark} customStyle={{ margin: 0, background: 'hsl(240 15% 9%)', fontSize: '13px', minHeight: '500px' }} showLineNumbers>
+                <CodeBlock language={selectedTemplate.language} style={atomOneDark} customStyle={{ margin: 0, background: 'hsl(240 15% 9%)', fontSize: '13px', minHeight: '500px' }} showLineNumbers>
                   {selectedTemplate.code}
-                </SyntaxHighlighter>
+                </CodeBlock>
               </div>
             </div>
           ) : (
@@ -552,9 +552,9 @@ export default function EducationPage() {
                   </div>
                   <h3 className="font-bold mb-2">{template.name}</h3>
                   <div className="rounded-lg overflow-hidden border border-white/5 max-h-24 mb-3">
-                    <SyntaxHighlighter language={template.language} style={atomOneDark} customStyle={{ margin: 0, background: 'hsl(240 15% 9%)', fontSize: '10px', maxHeight: '96px', overflow: 'hidden' }}>
+                    <CodeBlock language={template.language} style={atomOneDark} customStyle={{ margin: 0, background: 'hsl(240 15% 9%)', fontSize: '10px', maxHeight: '96px', overflow: 'hidden' }}>
                       {template.code.slice(0, 200) + '...'}
-                    </SyntaxHighlighter>
+                    </CodeBlock>
                   </div>
                   <button className="text-xs text-cyan-400 hover:underline flex items-center gap-1">
                     View Template <ArrowRight size={11} />

@@ -25,7 +25,7 @@ import { useContractStore, useWalletStore } from '@/store';
 import { formatAddress, formatTimeAgo } from '@/lib/utils/formatting';
 import { NETWORKS } from '@/lib/constants/networks';
 import { v4 as uuidv4 } from 'uuid';
-import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
+import CodeBlock from '@/components/ui/CodeBlock';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { ERC721_TEMPLATE, MULTISIG_TEMPLATE } from '@/lib/constants/abis';
 import toast from 'react-hot-toast';
@@ -373,14 +373,14 @@ export default function ContractsPage() {
                 <span className="text-xs text-muted-foreground">Solidity ^0.8.20</span>
               </div>
               <div className="rounded-xl overflow-hidden border border-white/10 max-h-[340px]">
-                <SyntaxHighlighter
+                <CodeBlock
                   language="solidity"
                   style={atomOneDark}
                   customStyle={{ margin: 0, background: 'hsl(240 15% 9%)', fontSize: '11px', maxHeight: '340px' }}
                   showLineNumbers
                 >
                   {editedCode}
-                </SyntaxHighlighter>
+                </CodeBlock>
               </div>
             </div>
 

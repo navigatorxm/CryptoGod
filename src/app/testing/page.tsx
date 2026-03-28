@@ -20,7 +20,7 @@ import {
   Activity,
   Bug,
 } from 'lucide-react';
-import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
+import CodeBlock from '@/components/ui/CodeBlock';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import toast from 'react-hot-toast';
 
@@ -390,14 +390,14 @@ export default function TestingPage() {
                 <span>Foundry</span>
               </div>
             </div>
-            <SyntaxHighlighter
+            <CodeBlock
               language="solidity"
               style={atomOneDark}
               customStyle={{ margin: 0, background: 'hsl(240 15% 9%)', fontSize: '12px', minHeight: '500px' }}
               showLineNumbers
             >
               {testCode}
-            </SyntaxHighlighter>
+            </CodeBlock>
           </div>
           <div className="grid grid-cols-3 gap-3">
             {[

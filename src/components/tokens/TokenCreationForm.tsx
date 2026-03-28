@@ -19,7 +19,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ERC20_TEMPLATE } from '@/lib/constants/abis';
 import { BrowserProvider, ContractFactory } from 'ethers';
 import CONTRACT from '@/lib/contracts/FullFeatureBEP20.json';
-import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
+import CodeBlock from '@/components/ui/CodeBlock';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import toast from 'react-hot-toast';
 
@@ -639,7 +639,7 @@ export default function TokenCreationForm({ onCreated, onCancel }: Props) {
               <div>
                 <h3 className="font-semibold text-sm mb-2">Generated Contract Code</h3>
                 <div className="rounded-xl overflow-hidden border border-white/10" style={{ maxHeight: '350px' }}>
-                  <SyntaxHighlighter
+                  <CodeBlock
                     language="solidity"
                     style={atomOneDark}
                     customStyle={{
@@ -652,7 +652,7 @@ export default function TokenCreationForm({ onCreated, onCancel }: Props) {
                     showLineNumbers
                   >
                     {generatedCode}
-                  </SyntaxHighlighter>
+                  </CodeBlock>
                 </div>
               </div>
             </div>
