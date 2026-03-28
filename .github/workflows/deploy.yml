@@ -27,21 +27,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          cache: 'yarn'
 
       - name: Cache node_modules
         uses: actions/cache@v4
-        id: npm-cache
+        id: yarn-cache
         with:
           path: node_modules
-          key: npm-${{ hashFiles('package-lock.json') }}
+          key: yarn-${{ hashFiles('yarn.lock') }}
 
       - name: Install dependencies
-        if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: npm ci --legacy-peer-deps
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
 
       - name: Build
-        run: npm run build
+        run: yarn build
         env:
           NEXT_PUBLIC_APP_NAME: CryptoGod Dashboard
           NEXT_PUBLIC_APP_URL: https://xmone.xyz
@@ -89,30 +89,27 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST || '51.195.109.250' }}
-          username: root
+          username: nav
           password: ${{ secrets.VPS_PASSWORD }}
           port: 22
           timeout: 600s
           command_timeout: 10m
           script: |
             set -e
-            cd /var/www/cryptogod
-            
+            cd ~/cryptogod
+
             echo "=== Pulling latest code ==="
             git pull origin main
-            
+
             echo "=== Installing dependencies ==="
-            npm ci --legacy-peer-deps --production
-            
-            echo "=== Building (optimized) ==="
-            npm run build
-            
+            yarn install --frozen-lockfile
+
+            echo "=== Building ==="
+            yarn build
+
             echo "=== Restarting app ==="
             pm2 restart cryptogod
             pm2 save
-            
-            echo "=== Cleanup old artifacts ==="
-            find /var/www/cryptogod/.next -type f -mtime +7 -delete 2>/dev/null || true
-            
+
             echo "=== Deploy complete ==="
             pm2 status
