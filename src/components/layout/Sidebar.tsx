@@ -90,6 +90,13 @@ const navItems: NavItem[] = [
     section: 'Blockchain Tools',
   },
   {
+    href: '/staking',
+    label: 'Staking',
+    icon: <TrendingUp size={18} />,
+    section: 'Blockchain Tools',
+    isNew: true,
+  },
+  {
     href: '/testing',
     label: 'Test Environment',
     icon: <FlaskConical size={18} />,

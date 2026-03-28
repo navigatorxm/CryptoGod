@@ -17,18 +17,21 @@ import {
   ShieldCheck,
   Crown,
   Menu,
+  Bot,
 } from 'lucide-react';
-import { useWalletStore, useAlertStore, useUIStore } from '@/store';
+import { useWalletStore, useAlertStore, useUIStore, useXClawStore } from '@/store';
 import { connectMetaMask, formatWalletError, switchChain } from '@/lib/web3/wallet';
 import { formatAddress } from '@/lib/utils/formatting';
 import { NETWORKS } from '@/lib/constants/networks';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
+import XClawPanel from '@/components/layout/XClawPanel';
 import toast from 'react-hot-toast';
 
 export default function Header() {
   const { connected, address, chainId, balance, walletType, setWallet, disconnect } = useWalletStore();
   const { unreadCount } = useAlertStore();
   const { activeNetwork, setActiveNetwork, toggleSidebar } = useUIStore();
+  const { togglePanel: toggleXClaw } = useXClawStore();
   const [connecting, setConnecting] = useState(false);
   const [showWalletMenu, setShowWalletMenu] = useState(false);
   const [showNetworkMenu, setShowNetworkMenu] = useState(false);
@@ -173,6 +176,15 @@ export default function Header() {
               )}
             </button>
           </div>
+
+          <button
+            onClick={toggleXClaw}
+            className="relative flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-muted-foreground transition-all hover:border-purple-400/20 hover:bg-purple-400/10 hover:text-purple-300"
+            title="X-Claw AI Assistant"
+          >
+            <Bot size={18} />
+            <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border border-slate-950 bg-emerald-400 shadow-[0_0_8px_rgba(74,222,128,0.8)]" />
+          </button>
 
           <div className="hidden sm:block h-8 w-px bg-white/10" />
 
@@ -381,6 +393,8 @@ export default function Header() {
           }}
         />
       )}
+
+      <XClawPanel />
     </>
   );
 }

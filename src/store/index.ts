@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { nanoid } from 'nanoid';
 import {
   TokenConfig,
   Transaction,
@@ -326,6 +327,55 @@ export const useTestingStore = create<TestingStore>()(
     { name: 'cryptogod-testing' }
   )
 );
+
+// ============================================
+// XClaw AI Assistant Store
+// ============================================
+export interface XClawMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+  streaming?: boolean;
+}
+
+interface XClawStore {
+  panelOpen: boolean;
+  messages: XClawMessage[];
+  setPanelOpen: (open: boolean) => void;
+  togglePanel: () => void;
+  addMessage: (msg: Omit<XClawMessage, 'id' | 'timestamp'>) => XClawMessage;
+  updateLastAssistantMessage: (content: string, streaming?: boolean) => void;
+  clearMessages: () => void;
+}
+
+export const useXClawStore = create<XClawStore>()((set, get) => ({
+  panelOpen: false,
+  messages: [],
+
+  setPanelOpen: (open) => set({ panelOpen: open }),
+  togglePanel: () => set((s) => ({ panelOpen: !s.panelOpen })),
+
+  addMessage: (msg) => {
+    const full: XClawMessage = { ...msg, id: nanoid(), timestamp: new Date() };
+    set((s) => ({ messages: [...s.messages, full] }));
+    return full;
+  },
+
+  updateLastAssistantMessage: (content, streaming = false) =>
+    set((s) => {
+      const msgs = [...s.messages];
+      for (let i = msgs.length - 1; i >= 0; i--) {
+        if (msgs[i].role === 'assistant') {
+          msgs[i] = { ...msgs[i], content, streaming };
+          break;
+        }
+      }
+      return { messages: msgs };
+    }),
+
+  clearMessages: () => set({ messages: [] }),
+}));
 
 // ============================================
 // Analytics Store

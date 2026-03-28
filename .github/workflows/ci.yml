@@ -6,10 +6,20 @@ on:
   pull_request:
     branches: [main]
 
+# Cancel in-progress runs on new commits
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   ci:
     name: Lint, Typecheck & Build
     runs-on: ubuntu-latest
+    
+    # Cache configuration for faster builds
+    env:
+      TURBO_CACHE_DIR: .turbo
+      NEXT_TELEMETRY_DISABLED: 1
 
     steps:
       - name: Checkout
@@ -19,19 +29,39 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'yarn'
+          cache: 'npm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          path: node_modules
+          key: npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            npm-
+
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}/.next/cache
+            ${{ github.workspace }}/.turbo
+          key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**/*.{ts,tsx}') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci --legacy-peer-deps
 
       - name: Lint
-        run: yarn lint
+        run: npm run lint
 
       - name: Typecheck
-        run: yarn typecheck
+        run: npm run typecheck
 
       - name: Build
-        run: yarn build
+        run: npm run build
         env:
           NEXT_PUBLIC_APP_NAME: CryptoGod Dashboard
           NEXT_PUBLIC_APP_URL: https://xmone.xyz
@@ -47,3 +77,11 @@ jobs:
           NEXT_PUBLIC_ENABLE_MAINNET: 'true'
           NEXT_PUBLIC_ENABLE_TESTNET: 'true'
           NEXT_PUBLIC_DEMO_MODE: 'false'
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: github.event_name == 'pull_request'
+        with:
+          name: build-output
+          path: .next
+          retention-days: 7

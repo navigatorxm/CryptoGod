@@ -4,14 +4,87 @@ on:
   push:
     branches: [main]
 
+# Cancel in-progress deploys on new commits
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  build:
+    name: Build & Cache
+    runs-on: ubuntu-latest
+    outputs:
+      build_hash: ${{ steps.hash.outputs.hash }}
+    
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          path: node_modules
+          key: npm-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci --legacy-peer-deps
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_APP_NAME: CryptoGod Dashboard
+          NEXT_PUBLIC_APP_URL: https://xmone.xyz
+          NEXT_PUBLIC_ADMIN_WALLET: ${{ secrets.NEXT_PUBLIC_ADMIN_WALLET || '0x85D697bC39a61f25a4075eD834B82b4d2Cc41c40' }}
+          NEXT_PUBLIC_ADMIN_WALLET_2: ${{ secrets.NEXT_PUBLIC_ADMIN_WALLET_2 || '0x3724A3179657c0aD23Eb3Fb4F7e2F176f490280e' }}
+          NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'build_placeholder' }}
+          NEXT_PUBLIC_ETHEREUM_RPC: https://eth.llamarpc.com
+          NEXT_PUBLIC_BSC_RPC: https://bsc-dataseed1.binance.org
+          NEXT_PUBLIC_POLYGON_RPC: https://polygon-rpc.com
+          NEXT_PUBLIC_AVALANCHE_RPC: https://api.avax.network/ext/bc/C/rpc
+          NEXT_PUBLIC_ARBITRUM_RPC: https://arb1.arbitrum.io/rpc
+          NEXT_PUBLIC_OPTIMISM_RPC: https://mainnet.optimism.io
+          NEXT_PUBLIC_ENABLE_MAINNET: 'true'
+          NEXT_PUBLIC_ENABLE_TESTNET: 'true'
+          NEXT_PUBLIC_DEMO_MODE: 'false'
+
+      - name: Create build hash
+        id: hash
+        run: echo "hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextjs-build
+          path: |
+            .next/standalone
+            .next/static
+          retention-days: 1
+
   deploy:
     name: Deploy to VPS
     runs-on: ubuntu-latest
+    needs: build
     # Only deploy after push to main (not on PRs)
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: nextjs-build
+          path: .next-build
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -23,19 +96,23 @@ jobs:
           command_timeout: 10m
           script: |
             set -e
-            echo "=== Pulling latest code ==="
             cd /var/www/cryptogod
+            
+            echo "=== Pulling latest code ==="
             git pull origin main
-
+            
             echo "=== Installing dependencies ==="
-            yarn install
-
-            echo "=== Building ==="
-            yarn build
-
+            npm ci --legacy-peer-deps --production
+            
+            echo "=== Building (optimized) ==="
+            npm run build
+            
             echo "=== Restarting app ==="
             pm2 restart cryptogod
             pm2 save
-
+            
+            echo "=== Cleanup old artifacts ==="
+            find /var/www/cryptogod/.next -type f -mtime +7 -delete 2>/dev/null || true
+            
             echo "=== Deploy complete ==="
             pm2 status

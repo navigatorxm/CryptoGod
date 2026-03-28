@@ -8,10 +8,28 @@ import { Toaster } from 'react-hot-toast';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'CryptoGod — Web3 Development Suite',
+  title: {
+    default: 'CryptoGod — Web3 Development Suite',
+    template: '%s | CryptoGod',
+  },
   description:
     'All-in-one platform for blockchain development, multi-chain token creation, smart contract deployment, NFT management, and Web3 education.',
-  keywords: ['web3', 'blockchain', 'ethereum', 'solidity', 'nft', 'defi', 'smart contracts'],
+  keywords: ['web3', 'blockchain', 'ethereum', 'solidity', 'nft', 'defi', 'smart contracts', 'token deployer', 'crypto'],
+  openGraph: {
+    type: 'website',
+    url: 'https://xmone.xyz',
+    siteName: 'CryptoGod',
+    title: 'CryptoGod — Web3 Development Suite',
+    description: 'All-in-one platform for multi-chain token creation, smart contract deployment, NFT management, and DeFi tools.',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'CryptoGod Dashboard' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'CryptoGod — Web3 Development Suite',
+    description: 'Deploy tokens, contracts, and NFTs across all major chains.',
+  },
+  robots: { index: true, follow: true },
+  metadataBase: new URL('https://xmone.xyz'),
 };
 
 export default function RootLayout({

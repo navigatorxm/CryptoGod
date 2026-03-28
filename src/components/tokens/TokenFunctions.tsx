@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Flame,
   Plus,
@@ -14,20 +14,28 @@ import {
   Zap,
   RefreshCw,
   AlertTriangle,
+  TrendingUp,
+  TrendingDown,
+  BarChart2,
+  Droplets,
+  DollarSign,
 } from 'lucide-react';
 import { TokenConfig } from '@/types';
 import { formatAddress, formatNumber, getExplorerTxUrl } from '@/lib/utils/formatting';
+import { fetchTokenPairs, formatDexChange, type DexScreenerPair } from '@/lib/api/dexscreener';
 import toast from 'react-hot-toast';
 
 interface Props {
   token: TokenConfig;
 }
 
-type FunctionTab = 'read' | 'write' | 'approvals';
+type FunctionTab = 'read' | 'write' | 'approvals' | 'market';
 
 export default function TokenFunctions({ token }: Props) {
   const [activeTab, setActiveTab] = useState<FunctionTab>('write');
   const [loading, setLoading] = useState<string | null>(null);
+  const [dexPairs, setDexPairs] = useState<DexScreenerPair[]>([]);
+  const [dexLoading, setDexLoading] = useState(false);
 
   const [mintTo, setMintTo] = useState('');
   const [mintAmount, setMintAmount] = useState('');
@@ -38,6 +46,15 @@ export default function TokenFunctions({ token }: Props) {
   const [approveAmount, setApproveAmount] = useState('');
 
   const [readResults, setReadResults] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (activeTab === 'market' && token.contractAddress) {
+      setDexLoading(true);
+      fetchTokenPairs(token.contractAddress)
+        .then(setDexPairs)
+        .finally(() => setDexLoading(false));
+    }
+  }, [activeTab, token.contractAddress]);
 
   const simulateAction = async (actionId: string, description: string, onSuccess?: () => void) => {
     setLoading(actionId);
@@ -133,13 +150,13 @@ export default function TokenFunctions({ token }: Props) {
 
       {/* Tabs */}
       <div className="flex gap-1 mb-4 p-1 rounded-lg w-fit bg-white/[0.03]">
-        {(['read', 'write', 'approvals'] as FunctionTab[]).map((tab) => (
+        {(['read', 'write', 'approvals', 'market'] as FunctionTab[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`tab-button text-xs capitalize ${activeTab === tab ? 'active' : ''}`}
           >
-            {tab}
+            {tab === 'market' ? '📈 Market' : tab}
           </button>
         ))}
       </div>
@@ -274,6 +291,129 @@ export default function TokenFunctions({ token }: Props) {
               }
             }}
           />
+        </div>
+      )}
+
+      {/* Market Data */}
+      {activeTab === 'market' && (
+        <div className="space-y-4">
+          {!token.contractAddress ? (
+            <div className="rounded-xl border border-amber-400/20 bg-amber-400/5 p-4 text-sm text-amber-200">
+              Deploy this token first to view live market data.
+            </div>
+          ) : dexLoading ? (
+            <div className="animate-pulse space-y-3">
+              {[1, 2].map((i) => <div key={i} className="h-28 rounded-xl bg-white/5" />)}
+            </div>
+          ) : dexPairs.length === 0 ? (
+            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-6 text-center">
+              <BarChart2 size={28} className="mx-auto mb-3 text-muted-foreground/40" />
+              <div className="text-sm font-medium text-white/70">No market data yet</div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Your token hasn&apos;t been added to a DEX yet. Add liquidity to get started.
+              </p>
+              <button
+                onClick={() => toast('Add liquidity via the Approvals tab — approve the DEX router first.', { icon: '💧' })}
+                className="mt-4 btn-primary text-xs h-8 px-4"
+              >
+                <Droplets size={12} /> How to Add Liquidity
+              </button>
+            </div>
+          ) : (
+            <>
+              {dexPairs.slice(0, 5).map((pair) => {
+                const change24h = formatDexChange(pair.priceChange?.h24 ?? 0);
+                return (
+                  <div key={pair.pairAddress} className="rounded-xl border border-white/5 bg-white/[0.02] p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-white">
+                          {pair.baseToken.symbol}/{pair.quoteToken.symbol}
+                        </span>
+                        <span className="rounded-full border border-blue-400/20 bg-blue-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-300">
+                          {pair.dexId}
+                        </span>
+                      </div>
+                      <a
+                        href={pair.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] text-muted-foreground hover:text-cyan-300 flex items-center gap-1"
+                      >
+                        DexScreener <ExternalLink size={10} />
+                      </a>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      <div className="rounded-lg bg-white/[0.03] p-2">
+                        <div className="text-[9px] uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                          <DollarSign size={9} /> Price
+                        </div>
+                        <div className="mt-1 text-sm font-semibold text-white">
+                          ${parseFloat(pair.priceUsd || '0').toFixed(8)}
+                        </div>
+                        <div className={`text-[10px] flex items-center gap-0.5 ${change24h.positive ? 'text-emerald-400' : 'text-red-400'}`}>
+                          {change24h.positive ? <TrendingUp size={9} /> : <TrendingDown size={9} />}
+                          {change24h.text} 24h
+                        </div>
+                      </div>
+                      <div className="rounded-lg bg-white/[0.03] p-2">
+                        <div className="text-[9px] uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                          <BarChart2 size={9} /> Vol 24h
+                        </div>
+                        <div className="mt-1 text-sm font-semibold text-white">
+                          ${formatNumber(pair.volume?.h24 ?? 0)}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground">
+                          {(pair.txns?.h24?.buys ?? 0) + (pair.txns?.h24?.sells ?? 0)} txns
+                        </div>
+                      </div>
+                      <div className="rounded-lg bg-white/[0.03] p-2">
+                        <div className="text-[9px] uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                          <Droplets size={9} /> Liquidity
+                        </div>
+                        <div className="mt-1 text-sm font-semibold text-white">
+                          ${formatNumber(pair.liquidity?.usd ?? 0)}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground">
+                          {formatNumber(pair.liquidity?.base ?? 0)} {pair.baseToken.symbol}
+                        </div>
+                      </div>
+                      <div className="rounded-lg bg-white/[0.03] p-2">
+                        <div className="text-[9px] uppercase tracking-wider text-muted-foreground">Mkt Cap</div>
+                        <div className="mt-1 text-sm font-semibold text-white">
+                          {pair.marketCap ? `$${formatNumber(pair.marketCap)}` : 'N/A'}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground">
+                          FDV: {pair.fdv ? `$${formatNumber(pair.fdv)}` : 'N/A'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 border-t border-white/5 pt-3">
+                      <div className="flex gap-3 text-[10px] text-muted-foreground">
+                        <span>Buys 24h: <span className="text-emerald-400">{pair.txns?.h24?.buys ?? 0}</span></span>
+                        <span>Sells 24h: <span className="text-red-400">{pair.txns?.h24?.sells ?? 0}</span></span>
+                        <span>1h: <span className={formatDexChange(pair.priceChange?.h1 ?? 0).positive ? 'text-emerald-400' : 'text-red-400'}>{formatDexChange(pair.priceChange?.h1 ?? 0).text}</span></span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              <button
+                onClick={() => {
+                  setDexLoading(true);
+                  fetchTokenPairs(token.contractAddress!)
+                    .then(setDexPairs)
+                    .finally(() => setDexLoading(false));
+                }}
+                className="btn-secondary w-full text-xs h-8"
+              >
+                <RefreshCw size={12} /> Refresh Data
+              </button>
+            </>
+          )}
         </div>
       )}
 

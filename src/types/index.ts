@@ -426,6 +426,26 @@ export interface CodeTemplate {
 }
 
 // ============================================
+// Staking Types
+// ============================================
+
+export interface StakingPool {
+  id: string;
+  name: string;
+  stakingToken: string;
+  stakingTokenSymbol: string;
+  rewardToken: string;
+  rewardTokenSymbol: string;
+  contractAddress?: string;
+  network: NetworkName;
+  apy: number;
+  tvl: number;
+  minStake?: string;
+  lockPeriod?: number; // days, 0 = flexible
+  isActive: boolean;
+}
+
+// ============================================
 // Wallet Types
 // ============================================
 
