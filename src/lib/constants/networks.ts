@@ -1,5 +1,18 @@
 import { NetworkConfig } from '@/types';
 
+// DEX router addresses (PancakeSwap V2 / Uniswap V2 forks)
+export const DEX_ROUTERS: Record<string, string> = {
+  ethereum:       '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', // Uniswap V2
+  sepolia:        '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', // Uniswap V2 (Sepolia)
+  bsc:            '0x10ED43C718714eb63d5aA57B78B54704E256024E', // PancakeSwap V2
+  'bsc-testnet':  '0xD99D1c33F9fC3444f8101754aBC46c52416550D1', // PancakeSwap V2 Testnet
+  polygon:        '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff', // QuickSwap
+  'polygon-amoy': '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff',
+  avalanche:      '0x60aE616a2155Ee3d9A68541Ba4544862310933d4', // TraderJoe
+  arbitrum:       '0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506', // SushiSwap
+  optimism:       '0x4A7b5Da61326A6379179b40d00F57E5bbDC962c2', // Velodrome
+};
+
 export const NETWORKS: Record<string, NetworkConfig> = {
   ethereum: {
     id: 1,

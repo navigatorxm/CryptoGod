@@ -14,9 +14,11 @@ import {
   X,
 } from 'lucide-react';
 import { TokenConfig, TokenStandard, NetworkName, TokenFeatures, ChainId } from '@/types';
-import { NETWORKS } from '@/lib/constants/networks';
+import { NETWORKS, DEX_ROUTERS } from '@/lib/constants/networks';
 import { v4 as uuidv4 } from 'uuid';
 import { ERC20_TEMPLATE } from '@/lib/constants/abis';
+import { BrowserProvider, ContractFactory } from 'ethers';
+import CONTRACT from '@/lib/contracts/FullFeatureBEP20.json';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import toast from 'react-hot-toast';
@@ -129,27 +131,103 @@ export default function TokenCreationForm({ onCreated, onCancel }: Props) {
   };
 
   const handleDeploy = async () => {
+    if (!window.ethereum) {
+      toast.error('MetaMask not found. Please install MetaMask.');
+      return;
+    }
+
+    const network = NETWORKS[formData.network];
+    if (!network?.isEVM) {
+      toast.error('Real deployment is only supported for EVM networks (BSC, Ethereum, Polygon…).');
+      return;
+    }
+
+    const routerAddress = DEX_ROUTERS[formData.network];
+    if (!routerAddress) {
+      toast.error(`No DEX router configured for ${formData.network}.`);
+      return;
+    }
+
     setDeploying(true);
+    const deployToast = toast.loading('Waiting for MetaMask confirmation…');
+
     try {
-      // Simulate deployment
-      await new Promise(r => setTimeout(r, 2500));
+      const provider = new BrowserProvider(window.ethereum);
+
+      // Ask MetaMask to switch to the right chain
+      const signerNetwork = await provider.getNetwork();
+      if (Number(signerNetwork.chainId) !== Number(network.id)) {
+        toast.loading(`Switching to ${network.name}…`, { id: deployToast });
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: `0x${Number(network.id).toString(16)}` }],
+        });
+      }
+
+      const signer = await provider.getSigner();
+      const ownerAddress = await signer.getAddress();
+
+      // Convert % tax to basis points (100 = 1%)
+      const toBps = (pct: number) => Math.round(pct * 100);
+      const totalOtherBuy  = taxConfig.liquidityFee + taxConfig.marketingFee + taxConfig.burnFee;
+      const totalOtherSell = taxConfig.liquidityFee + taxConfig.marketingFee + taxConfig.burnFee;
+
+      const cfg = {
+        name:           formData.name,
+        symbol:         formData.symbol,
+        decimals:       formData.decimals,
+        initialSupply:  BigInt(formData.totalSupply),
+        maxSupply:      BigInt(formData.totalSupply), // same as initial; owner can mint more
+        marketingWallet: ownerAddress,
+        routerAddress,
+        bReflection: features.reflection   ? toBps(taxConfig.reflectionFee) : 0,
+        bLiquidity:  features.autoLiquidity ? toBps(taxConfig.liquidityFee)  : 0,
+        bMarketing:  features.taxable       ? toBps(taxConfig.marketingFee)  : 0,
+        bBurn:       features.burnable      ? toBps(taxConfig.burnFee)       : 0,
+        sReflection: features.reflection    ? toBps(taxConfig.reflectionFee) : 0,
+        sLiquidity:  features.autoLiquidity ? toBps(taxConfig.liquidityFee)  : 0,
+        sMarketing:  features.taxable       ? toBps(taxConfig.marketingFee)  : 0,
+        sBurn:       features.burnable      ? toBps(taxConfig.burnFee)       : 0,
+        maxTxBps:     features.antiWhale  ? toBps(taxConfig.maxTransactionPercent) : 0,
+        maxWalletBps: features.maxWallet  ? toBps(taxConfig.maxWalletPercent)      : 0,
+      };
+
+      toast.loading('Deploying contract on-chain…', { id: deployToast });
+
+      const factory  = new ContractFactory(CONTRACT.abi, CONTRACT.bytecode, signer);
+      const contract = await factory.deploy(cfg);
+
+      toast.loading(`Tx sent: ${contract.deploymentTransaction()?.hash?.slice(0, 18)}…`, { id: deployToast });
+
+      await contract.waitForDeployment();
+
+      const contractAddress = await contract.getAddress();
+      const txHash = contract.deploymentTransaction()?.hash ?? '';
+
+      toast.success(`Token deployed at ${contractAddress.slice(0, 10)}…`, { id: deployToast });
 
       const token: TokenConfig = {
         id: uuidv4(),
         ...formData,
         standard: STANDARD_BY_NETWORK[formData.network],
-        chainId: NETWORKS[formData.network]?.id as ChainId,
+        chainId: network.id as ChainId,
         features,
         taxConfig: features.taxable ? taxConfig : undefined,
         createdAt: new Date(),
         deployedAt: new Date(),
-        contractAddress: `0x${Math.random().toString(16).slice(2, 42)}`,
-        deploymentTxHash: `0x${Math.random().toString(16).slice(2, 66)}`,
+        contractAddress,
+        deploymentTxHash: txHash,
+        owner: ownerAddress,
       };
 
       onCreated(token);
-    } catch (err) {
-      toast.error('Deployment failed. Check console for details.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes('user rejected')) {
+        toast.error('Transaction rejected.', { id: deployToast });
+      } else {
+        toast.error(`Deployment failed: ${msg.slice(0, 80)}`, { id: deployToast });
+      }
       console.error(err);
     } finally {
       setDeploying(false);
