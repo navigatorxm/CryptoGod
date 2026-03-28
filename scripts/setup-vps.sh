@@ -7,7 +7,7 @@ set -e
 
 APP_DIR="/var/www/cryptogod"
 APP_USER="cryptogod"
-DOMAIN=""        # set this: e.g. "cryptogod.yourdomain.com"
+DOMAIN=""        # leave blank for IP-only access; set to a domain if you have one
 PORT="3000"
 NODE_VERSION="20"
 

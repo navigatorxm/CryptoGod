@@ -25,7 +25,7 @@ import { useContractStore, useWalletStore } from '@/store';
 import { formatAddress, formatTimeAgo } from '@/lib/utils/formatting';
 import { NETWORKS } from '@/lib/constants/networks';
 import { v4 as uuidv4 } from 'uuid';
-import SyntaxHighlighter from 'react-syntax-highlighter';
+import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { ERC721_TEMPLATE, MULTISIG_TEMPLATE } from '@/lib/constants/abis';
 import toast from 'react-hot-toast';

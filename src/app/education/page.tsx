@@ -18,7 +18,7 @@ import {
   Award,
   ArrowRight,
 } from 'lucide-react';
-import SyntaxHighlighter from 'react-syntax-highlighter';
+import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 const TUTORIALS = [

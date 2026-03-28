@@ -19,7 +19,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ERC20_TEMPLATE } from '@/lib/constants/abis';
 import { BrowserProvider, ContractFactory } from 'ethers';
 import CONTRACT from '@/lib/contracts/FullFeatureBEP20.json';
-import SyntaxHighlighter from 'react-syntax-highlighter';
+import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import toast from 'react-hot-toast';
 
