@@ -20,7 +20,7 @@ import {
   FileCode,
   Layers,
 } from 'lucide-react';
-import { ContractConfig, ContractStandard, NetworkName } from '@/types';
+import { ContractConfig, ContractStandard, NetworkName, ChainId } from '@/types';
 import { useContractStore, useWalletStore } from '@/store';
 import { formatAddress, formatTimeAgo } from '@/lib/utils/formatting';
 import { NETWORKS } from '@/lib/constants/networks';
@@ -147,7 +147,7 @@ export default function ContractsPage() {
       name: contractName,
       standard: selectedTemplate.standard,
       network: selectedNetwork as NetworkName,
-      chainId: NETWORKS[selectedNetwork]?.id as number,
+      chainId: NETWORKS[selectedNetwork]?.id as ChainId,
       features: { ownable: true, upgradeable: false, pausable: true, enumerable: true, uriStorage: true, burnable: true, royalties: true, reveal: false, whitelist: false, publicMint: true, freeMint: false, multiSig: false, timelocked: false },
       constructorArgs: {},
       address: `0x${Math.random().toString(16).slice(2, 42)}`,

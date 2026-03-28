@@ -23,6 +23,19 @@ import toast from 'react-hot-toast';
 
 type Tab = 'general' | 'rpc' | 'notifications' | 'api-keys' | 'advanced';
 
+interface NotificationSettings {
+  largeTransfers: boolean;
+  contractEvents: boolean;
+  gasSpike: boolean;
+  deploymentSuccess: boolean;
+  testResults: boolean;
+  priceAlerts: boolean;
+  emailAlerts: boolean;
+  email: string;
+}
+
+type BooleanNotificationKey = Exclude<keyof NotificationSettings, 'email'>;
+
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<Tab>('general');
   const { theme, showTestnets, activeNetwork, setTheme, setShowTestnets } = useUIStore();
@@ -48,7 +61,7 @@ export default function SettingsPage() {
     walletconnect: '',
   });
 
-  const [notifications, setNotifications] = useState({
+  const [notifications, setNotifications] = useState<NotificationSettings>({
     largeTransfers: true,
     contractEvents: true,
     gasSpike: true,
@@ -216,7 +229,7 @@ export default function SettingsPage() {
             ].map(({ key, label, desc }) => (
               <ToggleSwitch
                 key={key}
-                value={(notifications as Record<string, boolean>)[key] as boolean}
+                value={notifications[key as BooleanNotificationKey]}
                 onChange={(v) => setNotifications(prev => ({ ...prev, [key]: v }))}
                 label={label}
                 description={desc}

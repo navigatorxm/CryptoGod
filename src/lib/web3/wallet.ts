@@ -1,4 +1,5 @@
 import { BrowserProvider, JsonRpcProvider, JsonRpcSigner, formatEther } from 'ethers';
+import type { WalletType } from '@/types';
 
 declare global {
   interface Window {
@@ -30,7 +31,7 @@ export interface WalletConnection {
   balance: string;
   provider: BrowserProvider;
   signer: JsonRpcSigner;
-  walletType: 'metamask' | 'coinbase' | 'injected';
+  walletType: WalletType;
 }
 
 export async function connectMetaMask(): Promise<WalletConnection> {

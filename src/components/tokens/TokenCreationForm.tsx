@@ -13,7 +13,7 @@ import {
   Globe,
   X,
 } from 'lucide-react';
-import { TokenConfig, TokenStandard, NetworkName, TokenFeatures } from '@/types';
+import { TokenConfig, TokenStandard, NetworkName, TokenFeatures, ChainId } from '@/types';
 import { NETWORKS } from '@/lib/constants/networks';
 import { v4 as uuidv4 } from 'uuid';
 import { ERC20_TEMPLATE } from '@/lib/constants/abis';
@@ -138,7 +138,7 @@ export default function TokenCreationForm({ onCreated, onCancel }: Props) {
         id: uuidv4(),
         ...formData,
         standard: STANDARD_BY_NETWORK[formData.network],
-        chainId: NETWORKS[formData.network]?.id as number,
+        chainId: NETWORKS[formData.network]?.id as ChainId,
         features,
         taxConfig: features.taxable ? taxConfig : undefined,
         createdAt: new Date(),

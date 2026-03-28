@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    name: Lint, Typecheck & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_APP_NAME: ${{ secrets.NEXT_PUBLIC_APP_NAME || 'CryptoGod Dashboard' }}
+          NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'ci_placeholder' }}
+          NEXT_PUBLIC_ETHEREUM_RPC: ${{ secrets.NEXT_PUBLIC_ETHEREUM_RPC || 'https://eth.llamarpc.com' }}
+          NEXT_PUBLIC_BSC_RPC: ${{ secrets.NEXT_PUBLIC_BSC_RPC || 'https://bsc-dataseed1.binance.org' }}
+          NEXT_PUBLIC_POLYGON_RPC: ${{ secrets.NEXT_PUBLIC_POLYGON_RPC || 'https://polygon-rpc.com' }}
+          NEXT_PUBLIC_AVALANCHE_RPC: ${{ secrets.NEXT_PUBLIC_AVALANCHE_RPC || 'https://api.avax.network/ext/bc/C/rpc' }}
+          NEXT_PUBLIC_ARBITRUM_RPC: ${{ secrets.NEXT_PUBLIC_ARBITRUM_RPC || 'https://arb1.arbitrum.io/rpc' }}
+          NEXT_PUBLIC_OPTIMISM_RPC: ${{ secrets.NEXT_PUBLIC_OPTIMISM_RPC || 'https://mainnet.optimism.io' }}
+          NEXT_PUBLIC_ENABLE_MAINNET: 'true'
+          NEXT_PUBLIC_ENABLE_TESTNET: 'true'
+          NEXT_PUBLIC_DEMO_MODE: 'false'
