@@ -59,12 +59,15 @@ const DEPLOY_DATA = Array.from({ length: 7 }, (_, i) => ({
   nfts: Math.floor(Math.random() * 20),
 }));
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+interface TooltipEntry { name: string; value: number; color: string; }
+interface TooltipProps { active?: boolean; payload?: TooltipEntry[]; label?: string; }
+
+const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="glass-card p-3 text-xs border border-white/10">
         <div className="font-semibold mb-1">{label}</div>
-        {payload.map((p: any) => (
+        {payload.map((p) => (
           <div key={p.name} style={{ color: p.color }}>{p.name}: {p.value}</div>
         ))}
       </div>
@@ -77,9 +80,9 @@ export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState('30d');
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px] mx-auto">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-[1400px] mx-auto">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-3">
             <BarChart3 className="text-blue-400" size={24} />
@@ -123,9 +126,9 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Charts Row 1 */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Transaction Volume */}
-        <div className="col-span-2 glass-card p-5">
+        <div className="lg:col-span-2 glass-card p-5">
           <h2 className="font-semibold mb-4 text-sm">Transaction Volume (30 days)</h2>
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={TX_DATA}>

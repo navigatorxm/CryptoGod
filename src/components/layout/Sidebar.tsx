@@ -195,10 +195,25 @@ export default function Sidebar() {
   };
 
   return (
+    <>
+      {/* Mobile backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+          onClick={toggleSidebar}
+          aria-hidden="true"
+        />
+      )}
+
     <aside
-      className={`relative flex h-screen flex-col overflow-hidden border-r border-white/10 transition-all duration-300 ease-in-out ${
-        sidebarOpen ? 'w-72' : 'w-20'
-      }`}
+      className={`
+        fixed inset-y-0 left-0 z-50
+        md:relative md:z-auto md:translate-x-0
+        flex h-screen flex-col overflow-hidden border-r border-white/10
+        transition-all duration-300 ease-in-out
+        w-72
+        ${sidebarOpen ? 'translate-x-0 md:w-72' : '-translate-x-full md:-translate-x-0 md:w-20'}
+      `}
       style={{
         background:
           'radial-gradient(circle at top left, rgba(59,130,246,0.12), transparent 24%), radial-gradient(circle at top right, rgba(168,85,247,0.12), transparent 28%), linear-gradient(180deg, rgba(10,14,27,0.96) 0%, rgba(7,10,20,0.98) 100%)',
@@ -425,12 +440,13 @@ export default function Sidebar() {
       {!sidebarOpen && (
         <button
           onClick={toggleSidebar}
-          className="absolute -right-3 top-24 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-cyan-400/20 bg-slate-950 text-cyan-300 shadow-[0_0_24px_rgba(34,211,238,0.18)] transition-all hover:scale-105 hover:border-cyan-300/30 hover:bg-cyan-400/10"
+          className="absolute -right-3 top-24 z-20 hidden md:flex h-8 w-8 items-center justify-center rounded-full border border-cyan-400/20 bg-slate-950 text-cyan-300 shadow-[0_0_24px_rgba(34,211,238,0.18)] transition-all hover:scale-105 hover:border-cyan-300/30 hover:bg-cyan-400/10"
           aria-label="Expand sidebar"
         >
           <PanelLeftOpen size={14} />
         </button>
       )}
     </aside>
+    </>
   );
 }

@@ -247,9 +247,9 @@ export default function TestingPage() {
   const failedTests = suites.reduce((acc, s) => acc + s.tests.filter(t => t.status === 'failed').length, 0);
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px] mx-auto">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-[1400px] mx-auto">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-3">
             <FlaskConical className="text-green-400" size={24} />
@@ -268,7 +268,7 @@ export default function TestingPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Total Tests', value: totalTests, color: 'text-foreground' },
           { label: 'Passed', value: passedTests, color: 'text-green-400' },
@@ -399,7 +399,7 @@ export default function TestingPage() {
               {testCode}
             </CodeBlock>
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
               { label: 'Test Framework', value: 'Foundry (forge test)' },
               { label: 'Coverage', value: '94.3% (estimated)' },

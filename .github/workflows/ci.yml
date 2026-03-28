@@ -19,28 +19,31 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          cache: 'yarn'
 
       - name: Install dependencies
-        run: npm ci
+        run: yarn install --frozen-lockfile
 
       - name: Lint
-        run: npm run lint
+        run: yarn lint
 
       - name: Typecheck
-        run: npm run typecheck
+        run: yarn typecheck
 
       - name: Build
-        run: npm run build
+        run: yarn build
         env:
-          NEXT_PUBLIC_APP_NAME: ${{ secrets.NEXT_PUBLIC_APP_NAME || 'CryptoGod Dashboard' }}
+          NEXT_PUBLIC_APP_NAME: CryptoGod Dashboard
+          NEXT_PUBLIC_APP_URL: https://xmone.xyz
+          NEXT_PUBLIC_ADMIN_WALLET: ${{ secrets.NEXT_PUBLIC_ADMIN_WALLET || '0x85D697bC39a61f25a4075eD834B82b4d2Cc41c40' }}
+          NEXT_PUBLIC_ADMIN_WALLET_2: ${{ secrets.NEXT_PUBLIC_ADMIN_WALLET_2 || '0x3724A3179657c0aD23Eb3Fb4F7e2F176f490280e' }}
           NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'ci_placeholder' }}
-          NEXT_PUBLIC_ETHEREUM_RPC: ${{ secrets.NEXT_PUBLIC_ETHEREUM_RPC || 'https://eth.llamarpc.com' }}
-          NEXT_PUBLIC_BSC_RPC: ${{ secrets.NEXT_PUBLIC_BSC_RPC || 'https://bsc-dataseed1.binance.org' }}
-          NEXT_PUBLIC_POLYGON_RPC: ${{ secrets.NEXT_PUBLIC_POLYGON_RPC || 'https://polygon-rpc.com' }}
-          NEXT_PUBLIC_AVALANCHE_RPC: ${{ secrets.NEXT_PUBLIC_AVALANCHE_RPC || 'https://api.avax.network/ext/bc/C/rpc' }}
-          NEXT_PUBLIC_ARBITRUM_RPC: ${{ secrets.NEXT_PUBLIC_ARBITRUM_RPC || 'https://arb1.arbitrum.io/rpc' }}
-          NEXT_PUBLIC_OPTIMISM_RPC: ${{ secrets.NEXT_PUBLIC_OPTIMISM_RPC || 'https://mainnet.optimism.io' }}
+          NEXT_PUBLIC_ETHEREUM_RPC: https://eth.llamarpc.com
+          NEXT_PUBLIC_BSC_RPC: https://bsc-dataseed1.binance.org
+          NEXT_PUBLIC_POLYGON_RPC: https://polygon-rpc.com
+          NEXT_PUBLIC_AVALANCHE_RPC: https://api.avax.network/ext/bc/C/rpc
+          NEXT_PUBLIC_ARBITRUM_RPC: https://arb1.arbitrum.io/rpc
+          NEXT_PUBLIC_OPTIMISM_RPC: https://mainnet.optimism.io
           NEXT_PUBLIC_ENABLE_MAINNET: 'true'
           NEXT_PUBLIC_ENABLE_TESTNET: 'true'
           NEXT_PUBLIC_DEMO_MODE: 'false'

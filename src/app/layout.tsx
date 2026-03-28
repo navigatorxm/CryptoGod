@@ -38,6 +38,7 @@ export default function RootLayout({
         {/* Toast Notifications */}
         <Toaster
           position="bottom-right"
+          containerStyle={{ bottom: 24, right: 16 }}
           toastOptions={{
             style: {
               background: 'hsl(240 10% 11%)',

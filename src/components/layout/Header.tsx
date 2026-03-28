@@ -15,22 +15,26 @@ import {
   Command,
   Activity,
   ShieldCheck,
+  Crown,
+  Menu,
 } from 'lucide-react';
 import { useWalletStore, useAlertStore, useUIStore } from '@/store';
-import { connectMetaMask, formatWalletError } from '@/lib/web3/wallet';
+import { connectMetaMask, formatWalletError, switchChain } from '@/lib/web3/wallet';
 import { formatAddress } from '@/lib/utils/formatting';
 import { NETWORKS } from '@/lib/constants/networks';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 import toast from 'react-hot-toast';
 
 export default function Header() {
   const { connected, address, chainId, balance, walletType, setWallet, disconnect } = useWalletStore();
   const { unreadCount } = useAlertStore();
-  const { activeNetwork, setActiveNetwork } = useUIStore();
+  const { activeNetwork, setActiveNetwork, toggleSidebar } = useUIStore();
   const [connecting, setConnecting] = useState(false);
   const [showWalletMenu, setShowWalletMenu] = useState(false);
   const [showNetworkMenu, setShowNetworkMenu] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
 
+  const isAdmin = useIsAdmin();
   const currentNetwork = Object.values(NETWORKS).find((n) => n.id === chainId);
   const selectedNetwork =
     Object.values(NETWORKS).find((n) => n.shortName === activeNetwork) || currentNetwork || Object.values(NETWORKS)[0];
@@ -96,7 +100,16 @@ export default function Header() {
           backdropFilter: 'blur(18px)',
         }}
       >
-        <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-4">
+        <div className="flex min-w-0 flex-1 items-center gap-2 lg:gap-4">
+          {/* Mobile hamburger */}
+          <button
+            onClick={toggleSidebar}
+            className="md:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-muted-foreground transition-all hover:border-cyan-400/20 hover:text-cyan-300"
+            aria-label="Toggle sidebar"
+          >
+            <Menu size={18} />
+          </button>
+
           <div className="hidden xl:flex items-center gap-2 rounded-2xl border border-cyan-400/15 bg-cyan-400/5 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-cyan-300">
             <Command size={14} />
             Command Deck
@@ -194,7 +207,7 @@ export default function Header() {
 
             {showNetworkMenu && (
               <div
-                className="absolute right-0 top-full z-50 mt-3 w-72 overflow-hidden rounded-2xl border border-white/10 shadow-2xl"
+                className="absolute right-0 top-full z-50 mt-3 w-72 max-w-[calc(100vw-1rem)] overflow-hidden rounded-2xl border border-white/10 shadow-2xl"
                 style={{ background: 'linear-gradient(180deg, rgba(10,14,24,0.98), rgba(8,11,20,0.98))' }}
               >
                 <div className="border-b border-white/10 px-4 py-3">
@@ -210,9 +223,17 @@ export default function Header() {
                     return (
                       <button
                         key={network.shortName}
-                        onClick={() => {
+                        onClick={async () => {
                           setActiveNetwork(network.shortName);
                           setShowNetworkMenu(false);
+                          if (connected && network.isEVM) {
+                            try {
+                              await switchChain(Number(network.id));
+                              toast.success(`Switched to ${network.name}`);
+                            } catch (err) {
+                              toast.error(formatWalletError(err));
+                            }
+                          }
                         }}
                         className={`flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-sm transition-all ${
                           isSelected
@@ -268,13 +289,19 @@ export default function Header() {
                     {balance ? `${parseFloat(balance).toFixed(4)} ${currentNetwork?.symbol || 'ETH'}` : 'Loading balance...'}
                   </div>
                 </div>
+                {isAdmin && (
+                  <span className="hidden md:flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-amber-300">
+                    <Crown size={9} />
+                    Admin
+                  </span>
+                )}
                 <div className="hidden md:flex h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_14px_rgba(74,222,128,0.8)]" />
                 <ChevronDown size={14} className={`text-muted-foreground transition-transform ${showWalletMenu ? 'rotate-180' : ''}`} />
               </button>
 
               {showWalletMenu && (
                 <div
-                  className="absolute right-0 top-full z-50 mt-3 w-72 overflow-hidden rounded-2xl border border-white/10 shadow-2xl"
+                  className="absolute right-0 top-full z-50 mt-3 w-72 max-w-[calc(100vw-1rem)] overflow-hidden rounded-2xl border border-white/10 shadow-2xl"
                   style={{ background: 'linear-gradient(180deg, rgba(10,14,24,0.98), rgba(8,11,20,0.98))' }}
                 >
                   <div className="border-b border-white/10 p-4">
@@ -283,7 +310,15 @@ export default function Header() {
                         {getWalletIcon()}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-semibold text-white">{formatAddress(address, 6)}</div>
+                        <div className="flex items-center gap-2">
+                          <span className="truncate text-sm font-semibold text-white">{formatAddress(address, 6)}</span>
+                          {isAdmin && (
+                            <span className="flex shrink-0 items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-amber-300">
+                              <Crown size={8} />
+                              Admin
+                            </span>
+                          )}
+                        </div>
                         <div className="mt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground capitalize">
                           {walletType || 'wallet'}
                         </div>

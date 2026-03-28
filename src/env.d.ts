@@ -40,6 +40,10 @@ declare namespace NodeJS {
     // Analytics
     NEXT_PUBLIC_ANALYTICS_ID?: string;
 
+    // Master Admin Wallets
+    NEXT_PUBLIC_ADMIN_WALLET?: string;
+    NEXT_PUBLIC_ADMIN_WALLET_2?: string;
+
     // Feature Flags
     NEXT_PUBLIC_ENABLE_MAINNET?: string;
     NEXT_PUBLIC_ENABLE_TESTNET?: string;

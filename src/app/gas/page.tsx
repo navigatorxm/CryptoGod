@@ -80,8 +80,8 @@ export default function GasPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-[1200px] mx-auto">
-      <div className="flex items-start justify-between">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-[1200px] mx-auto">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-3">
             <Zap className="text-yellow-400" size={24} />
@@ -96,7 +96,7 @@ export default function GasPage() {
       </div>
 
       {/* Live Gas Prices by Network */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {NETWORKS_GAS.map(network => (
           <button
             key={network.name}
@@ -190,7 +190,7 @@ export default function GasPage() {
               <Line type="monotone" dataKey="gwei" stroke="#F59E0B" strokeWidth={2} dot={false} />
             </LineChart>
           </ResponsiveContainer>
-          <div className="mt-4 grid grid-cols-3 gap-3 text-center">
+          <div className="mt-4 grid grid-cols-3 sm:grid-cols-3 gap-3 text-center">
             {[
               { label: 'Current', value: `${liveGas.toFixed(1)} Gwei`, color: 'text-yellow-400' },
               { label: '24h Low', value: '15.2 Gwei', color: 'text-green-400' },

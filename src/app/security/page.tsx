@@ -487,9 +487,9 @@ export default function SecurityPage() {
   }[s] || 'text-gray-400');
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px] mx-auto">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-[1400px] mx-auto">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-3">
             <ShieldAlert className="text-red-400" size={24} />
@@ -518,9 +518,9 @@ export default function SecurityPage() {
 
       {/* Attack Vectors */}
       {activeTab === 'vectors' && (
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           {/* Vector List */}
-          <div className="col-span-1 space-y-2">
+          <div className="lg:col-span-1 space-y-2">
             {ATTACK_VECTORS.map(vector => (
               <button
                 key={vector.id}
@@ -543,7 +543,7 @@ export default function SecurityPage() {
           </div>
 
           {/* Vector Detail */}
-          <div className="col-span-3 space-y-4">
+          <div className="lg:col-span-3 space-y-4">
             <div className="glass-card p-5">
               <div className="flex items-center gap-3 mb-3">
                 <span className={`severity-${selectedVector.severity}`}>{selectedVector.severity.toUpperCase()}</span>

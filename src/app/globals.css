@@ -405,4 +405,23 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* Mobile touch targets */
+  @media (max-width: 767px) {
+    .sidebar-item {
+      min-height: 44px;
+    }
+
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger {
+      min-height: 44px;
+    }
+
+    .tab-button {
+      min-height: 40px;
+      padding-left: 0.875rem;
+      padding-right: 0.875rem;
+    }
+  }
 }

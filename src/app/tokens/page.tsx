@@ -116,9 +116,9 @@ export default function TokensPage() {
   const getNetworkInfo = (network: string) => NETWORKS[network];
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px] mx-auto">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-[1400px] mx-auto">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-3">
             <Coins className="text-purple-400" size={24} />
@@ -138,7 +138,7 @@ export default function TokensPage() {
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Total Tokens', value: allTokens.length, icon: <Coins size={16} />, color: 'text-purple-400' },
           { label: 'EVM Tokens', value: allTokens.filter(t => ['ERC20', 'BEP20', 'ERC777'].includes(t.standard)).length, icon: <TrendingUp size={16} />, color: 'text-blue-400' },

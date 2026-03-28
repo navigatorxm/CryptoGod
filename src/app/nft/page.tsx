@@ -154,9 +154,9 @@ export default function NFTPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px] mx-auto">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-[1400px] mx-auto">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-3">
             <Image className="text-pink-400" size={24} />
@@ -177,7 +177,7 @@ export default function NFTPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Collections', value: allCollections.length, color: 'text-pink-400' },
           { label: 'Total Minted', value: allCollections.reduce((a, c) => a + c.totalMinted, 0).toLocaleString(), color: 'text-purple-400' },
@@ -225,7 +225,7 @@ export default function NFTPage() {
                       <span className="badge badge-blue text-[9px]">{coll.standard}</span>
                     </div>
                     <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{coll.description}</p>
-                    <div className="grid grid-cols-4 gap-4 text-xs mb-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs mb-3">
                       <div>
                         <div className="text-muted-foreground">Minted</div>
                         <div className="font-semibold">{coll.totalMinted.toLocaleString()} / {coll.maxSupply.toLocaleString()}</div>
@@ -437,7 +437,7 @@ export default function NFTPage() {
                 <label className="block text-sm font-medium mb-2">Description</label>
                 <textarea value={collDesc} onChange={e => setCollDesc(e.target.value)} placeholder="Describe your collection..." className="crypto-input resize-none" rows={3} />
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-sm font-medium mb-2">Max Supply</label>
                   <input type="number" value={collMaxSupply} onChange={e => setCollMaxSupply(e.target.value)} className="crypto-input" />

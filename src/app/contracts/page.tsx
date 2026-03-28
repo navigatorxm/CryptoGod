@@ -170,9 +170,9 @@ export default function ContractsPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px] mx-auto">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-[1400px] mx-auto">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-3">
             <Code2 className="text-blue-400" size={24} />
@@ -195,7 +195,7 @@ export default function ContractsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Contracts Deployed', value: allContracts.length, color: 'text-blue-400' },
           { label: 'Verified', value: allContracts.filter(c => c.verified).length, color: 'text-green-400' },
@@ -295,9 +295,9 @@ export default function ContractsPage() {
 
       {/* Deployment Wizard */}
       {view === 'wizard' && (
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Template Selection */}
-          <div className="col-span-1 space-y-3">
+          <div className="lg:col-span-1 space-y-3">
             <h2 className="font-semibold">Select Template</h2>
             {CONTRACT_TEMPLATES.map((template) => (
               <button
@@ -326,7 +326,7 @@ export default function ContractsPage() {
           </div>
 
           {/* Configuration + Code */}
-          <div className="col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-4">
             <h2 className="font-semibold">Configure & Deploy: {selectedTemplate.name}</h2>
 
             <div className="grid grid-cols-2 gap-4">

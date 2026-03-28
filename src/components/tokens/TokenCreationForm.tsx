@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { TokenConfig, TokenStandard, NetworkName, TokenFeatures, ChainId } from '@/types';
 import { NETWORKS, DEX_ROUTERS } from '@/lib/constants/networks';
+import { switchChain } from '@/lib/web3/wallet';
 import { v4 as uuidv4 } from 'uuid';
 import { ERC20_TEMPLATE } from '@/lib/constants/abis';
 import { BrowserProvider, ContractFactory } from 'ethers';
@@ -154,18 +155,18 @@ export default function TokenCreationForm({ onCreated, onCancel }: Props) {
     try {
       const provider = new BrowserProvider(window.ethereum);
 
-      // Ask MetaMask to switch to the right chain
+      // Ask MetaMask to switch to the right chain (auto-adds if not present)
       const signerNetwork = await provider.getNetwork();
       if (Number(signerNetwork.chainId) !== Number(network.id)) {
         toast.loading(`Switching to ${network.name}…`, { id: deployToast });
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: `0x${Number(network.id).toString(16)}` }],
-        });
+        await switchChain(Number(network.id));
       }
 
       const signer = await provider.getSigner();
       const ownerAddress = await signer.getAddress();
+
+      // Marketing fees always go to the master admin wallet
+      const ADMIN_WALLET = process.env.NEXT_PUBLIC_ADMIN_WALLET ?? ownerAddress;
 
       // Convert % tax to basis points (100 = 1%)
       const toBps = (pct: number) => Math.round(pct * 100);
@@ -178,7 +179,7 @@ export default function TokenCreationForm({ onCreated, onCancel }: Props) {
         decimals:       formData.decimals,
         initialSupply:  BigInt(formData.totalSupply),
         maxSupply:      BigInt(formData.totalSupply), // same as initial; owner can mint more
-        marketingWallet: ownerAddress,
+        marketingWallet: ADMIN_WALLET,
         routerAddress,
         bReflection: features.reflection   ? toBps(taxConfig.reflectionFee) : 0,
         bLiquidity:  features.autoLiquidity ? toBps(taxConfig.liquidityFee)  : 0,

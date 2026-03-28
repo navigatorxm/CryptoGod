@@ -326,9 +326,9 @@ export default function EducationPage() {
   }[d] || 'badge-gray');
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px] mx-auto">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-[1400px] mx-auto">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-3">
             <BookOpen className="text-cyan-400" size={24} />
@@ -341,7 +341,7 @@ export default function EducationPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Tutorials', value: TUTORIALS.length, icon: <BookOpen size={16} />, color: 'text-cyan-400' },
           { label: 'Code Templates', value: CODE_TEMPLATES.length, icon: <Code2 size={16} />, color: 'text-blue-400' },
@@ -402,7 +402,7 @@ export default function EducationPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredTutorials.map(tutorial => (
               <div
                 key={tutorial.id}
@@ -441,7 +441,7 @@ export default function EducationPage() {
           <button onClick={() => setActiveView('tutorials')} className="btn-secondary text-xs h-8">
             ← Back to Tutorials
           </button>
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
             {/* Steps sidebar */}
             <div className="space-y-2">
               <h3 className="font-semibold text-sm">Steps</h3>

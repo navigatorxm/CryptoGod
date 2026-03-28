@@ -1,0 +1,41 @@
+name: Deploy to xmone.xyz
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    # Only deploy after push to main (not on PRs)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST || '51.195.109.250' }}
+          username: root
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: 22
+          timeout: 600s
+          command_timeout: 10m
+          script: |
+            set -e
+            echo "=== Pulling latest code ==="
+            cd /var/www/cryptogod
+            git pull origin main
+
+            echo "=== Installing dependencies ==="
+            yarn install
+
+            echo "=== Building ==="
+            yarn build
+
+            echo "=== Restarting app ==="
+            pm2 restart cryptogod
+            pm2 save
+
+            echo "=== Deploy complete ==="
+            pm2 status

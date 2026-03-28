@@ -67,9 +67,9 @@ export default function MainnetPage() {
   }[s] || 'border-l-gray-500 bg-gray-500/5');
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px] mx-auto">
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-[1400px] mx-auto">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-3">
             <Server className="text-yellow-400" size={24} />
@@ -88,7 +88,7 @@ export default function MainnetPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Live Contracts', value: MOCK_DEPLOYMENTS.filter(d => d.status === 'active' && !d.paused).length, color: 'text-green-400', icon: <Activity size={16} /> },
           { label: 'Paused Contracts', value: MOCK_DEPLOYMENTS.filter(d => d.paused).length, color: 'text-yellow-400', icon: <Pause size={16} /> },
@@ -226,7 +226,7 @@ export default function MainnetPage() {
               Emergency Controls
             </h2>
             <p className="text-sm text-muted-foreground mb-4">Use these controls only in emergency situations. All actions are logged and require multi-sig confirmation.</p>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <button
                 onClick={() => {
                   if (confirm('⚠️ Pause ALL contracts? This is an emergency action.')) {
@@ -259,7 +259,7 @@ export default function MainnetPage() {
               <Lock size={18} className="text-purple-400" />
               Multi-Signature Wallet
             </h2>
-            <div className="grid grid-cols-3 gap-4 mb-5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
               <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5">
                 <div className="text-xs text-muted-foreground mb-1">Wallet Address</div>
                 <div className="font-mono text-sm">0xMultiSig...1234</div>

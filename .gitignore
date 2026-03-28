@@ -42,3 +42,6 @@ next-env.d.ts
 # Helper scripts
 scripts/check-versions.cjs
 scripts/patch-constructor.cjs
+
+# Deployment scripts with credentials (run locally only)
+scripts/deploy.py

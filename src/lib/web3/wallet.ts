@@ -64,6 +64,24 @@ export async function connectMetaMask(): Promise<WalletConnection> {
   };
 }
 
+/** Chain metadata needed to auto-add networks that aren't in MetaMask yet */
+const CHAIN_META: Record<number, {
+  chainName: string;
+  nativeCurrency: { name: string; symbol: string; decimals: number };
+  rpcUrls: string[];
+  blockExplorerUrls: string[];
+}> = {
+  1:        { chainName: 'Ethereum Mainnet',   nativeCurrency: { name: 'Ether',   symbol: 'ETH', decimals: 18 }, rpcUrls: ['https://eth.llamarpc.com'],                  blockExplorerUrls: ['https://etherscan.io'] },
+  11155111: { chainName: 'Sepolia Testnet',    nativeCurrency: { name: 'Ether',   symbol: 'ETH', decimals: 18 }, rpcUrls: ['https://rpc.sepolia.org'],                   blockExplorerUrls: ['https://sepolia.etherscan.io'] },
+  56:       { chainName: 'BNB Smart Chain',    nativeCurrency: { name: 'BNB',     symbol: 'BNB', decimals: 18 }, rpcUrls: ['https://bsc-dataseed1.binance.org'],          blockExplorerUrls: ['https://bscscan.com'] },
+  97:       { chainName: 'BSC Testnet',        nativeCurrency: { name: 'tBNB',    symbol: 'tBNB',decimals: 18 }, rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545'], blockExplorerUrls: ['https://testnet.bscscan.com'] },
+  137:      { chainName: 'Polygon Mainnet',    nativeCurrency: { name: 'MATIC',   symbol: 'MATIC',decimals: 18 }, rpcUrls: ['https://polygon-rpc.com'],                   blockExplorerUrls: ['https://polygonscan.com'] },
+  80002:    { chainName: 'Polygon Amoy',       nativeCurrency: { name: 'MATIC',   symbol: 'MATIC',decimals: 18 }, rpcUrls: ['https://rpc-amoy.polygon.technology'],       blockExplorerUrls: ['https://amoy.polygonscan.com'] },
+  43114:    { chainName: 'Avalanche C-Chain',  nativeCurrency: { name: 'AVAX',    symbol: 'AVAX', decimals: 18 }, rpcUrls: ['https://api.avax.network/ext/bc/C/rpc'],     blockExplorerUrls: ['https://snowtrace.io'] },
+  42161:    { chainName: 'Arbitrum One',       nativeCurrency: { name: 'Ether',   symbol: 'ETH', decimals: 18 }, rpcUrls: ['https://arb1.arbitrum.io/rpc'],               blockExplorerUrls: ['https://arbiscan.io'] },
+  10:       { chainName: 'Optimism',           nativeCurrency: { name: 'Ether',   symbol: 'ETH', decimals: 18 }, rpcUrls: ['https://mainnet.optimism.io'],                blockExplorerUrls: ['https://optimistic.etherscan.io'] },
+};
+
 export async function switchChain(chainId: number): Promise<void> {
   if (!window.ethereum) throw new Error('No wallet connected');
 
@@ -76,8 +94,20 @@ export async function switchChain(chainId: number): Promise<void> {
     });
   } catch (error: unknown) {
     if ((error as { code?: number }).code === 4902) {
-      // Chain not added, need to add it first
-      throw new Error(`Chain ${chainId} not configured in wallet. Please add it manually.`);
+      // Chain not in MetaMask — auto-add it
+      const meta = CHAIN_META[chainId];
+      if (!meta) throw new Error(`Chain ${chainId} not configured in wallet. Please add it manually.`);
+      await window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [{
+          chainId: hexChainId,
+          chainName: meta.chainName,
+          nativeCurrency: meta.nativeCurrency,
+          rpcUrls: meta.rpcUrls,
+          blockExplorerUrls: meta.blockExplorerUrls,
+        }],
+      });
+      return;
     }
     throw error;
   }
